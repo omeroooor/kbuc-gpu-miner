@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package miner;
+
+service MinerService {
+  // Start a new mining session
+  rpc StartMining (StartMiningRequest) returns (StartMiningResponse);
+  
+  // Pause current mining session
+  rpc PauseMining (PauseMiningRequest) returns (PauseMiningResponse);
+  
+  // Resume mining from saved state
+  rpc ResumeMining (ResumeMiningRequest) returns (ResumeMiningResponse);
+  
+  // Get current mining status
+  rpc GetStatus (GetStatusRequest) returns (GetStatusResponse);
+}
+
+message StartMiningRequest {
+  string hash = 1;
+  string addr1 = 2;
+  string addr2 = 3;
+  uint64 value = 4;
+  uint64 timestamp = 5;
+  string target = 6;
+  uint32 time_limit = 7;
+  uint32 flag = 8;  // Flag value (0 or 1)
+}
+
+message StartMiningResponse {
+  bool success = 1;
+  string message = 2;
+  string session_id = 3;
+}
+
+message PauseMiningRequest {
+  string session_id = 1;
+}
+
+message PauseMiningResponse {
+  bool success = 1;
+  string message = 2;
+  string state_file = 3;  // Path to saved state file
+}
+
+message ResumeMiningRequest {
+  string state_file = 1;
+  uint32 time_limit = 2;
+}
+
+message ResumeMiningResponse {
+  bool success = 1;
+  string message = 2;
+  string session_id = 3;
+}
+
+message GetStatusRequest {
+  string session_id = 1;
+}
+
+message GetStatusResponse {
+  bool is_mining = 1;
+  uint64 total_hashes = 2;
+  double hash_rate = 3;  // MH/s
+  string current_nonce = 4;
+  string message = 5;
+}

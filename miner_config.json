@@ -1,0 +1,7 @@
+{
+    "rpc_host": "http://localhost",
+    "rpc_port": 18332,
+    "rpc_user": "user",
+    "rpc_password": "pass",
+    "auto_broadcast": true
+}
