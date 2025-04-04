@@ -1,7 +1,12 @@
 {
-    "rpc_host": "http://localhost",
+    "rpc_host": "127.0.0.1",
     "rpc_port": 18332,
     "rpc_user": "user",
     "rpc_password": "pass",
-    "auto_broadcast": true
+    "auto_broadcast": true,
+    "hash": "",
+    "reward_address": "2ecaa57da5fcc9d45bc2d512eeb2b3e98e0393b7",
+    "flag": 1,
+    "target": "00000000ffff0000000000000000000000000000000000000000000000000000",
+    "max_time_seconds": 0
 }

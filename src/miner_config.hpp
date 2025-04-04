@@ -12,6 +12,11 @@ struct MinerConfig {
     std::string rpc_user;
     std::string rpc_password;
     bool auto_broadcast = true;
+    std::string hash = ""; // Optional hash (txid), empty means use zeros
+    std::string reward_address = "0000000000000000000000000000000000000000"; // Default reward address
+    int flag = 0; // 0 or 1
+    std::string target = "00000000ffff0000000000000000000000000000000000000000000000000000"; // Default target
+    int max_time_seconds = 60; // Default 60 seconds, 0 for unlimited
 
     static MinerConfig fromFile(const std::string& path) {
         MinerConfig config;
@@ -58,6 +63,26 @@ struct MinerConfig {
             if (j.contains("auto_broadcast")) {
                 config.auto_broadcast = j["auto_broadcast"].get<bool>();
                 std::cout << "Found auto_broadcast: " << (config.auto_broadcast ? "true" : "false") << std::endl;
+            }
+            if (j.contains("hash")) {
+                config.hash = j["hash"].get<std::string>();
+                std::cout << "Found hash: " << (config.hash.empty() ? "[empty, will use zeros]" : config.hash) << std::endl;
+            }
+            if (j.contains("reward_address")) {
+                config.reward_address = j["reward_address"].get<std::string>();
+                std::cout << "Found reward_address: " << config.reward_address << std::endl;
+            }
+            if (j.contains("flag")) {
+                config.flag = j["flag"].get<int>();
+                std::cout << "Found flag: " << config.flag << std::endl;
+            }
+            if (j.contains("target")) {
+                config.target = j["target"].get<std::string>();
+                std::cout << "Found target: " << config.target << std::endl;
+            }
+            if (j.contains("max_time_seconds")) {
+                config.max_time_seconds = j["max_time_seconds"].get<int>();
+                std::cout << "Found max_time_seconds: " << config.max_time_seconds << std::endl;
             }
         } catch (const nlohmann::json::exception& e) {
             std::cerr << "JSON parsing error: " << e.what() << std::endl;

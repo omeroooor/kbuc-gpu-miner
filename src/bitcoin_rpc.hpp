@@ -52,6 +52,46 @@ public:
             return false;
         }
     }
+    
+    std::pair<std::string, uint32_t> getSupportableLeader() {
+        std::cout << "\nCalling getsupportableleader RPC method" << std::endl;
+        
+        nlohmann::json request;
+        request["jsonrpc"] = "1.0";
+        request["id"] = "curltest";
+        request["method"] = "getsupportableleader";
+        request["params"] = nlohmann::json::array();
+
+        std::string requestStr = request.dump(2);
+        std::cout << "Request JSON:\n" << requestStr << std::endl;
+
+        try {
+            std::string response = makeRequest(requestStr);
+            std::cout << "Response from Bitcoin RPC:\n" << response << std::endl;
+            
+            auto json = nlohmann::json::parse(response);
+            
+            if (json["error"].is_null() && json.contains("result")) {
+                std::string leader = json["result"]["leader"].get<std::string>();
+                uint32_t height = json["result"]["height"].get<uint32_t>();
+                
+                std::cout << "Retrieved leader: " << leader << std::endl;
+                std::cout << "Retrieved height: " << height << std::endl;
+                
+                return { leader, height };
+            } else {
+                std::string errorMsg = "RPC error";
+                if (!json["error"].is_null()) {
+                    errorMsg = json["error"]["message"].get<std::string>();
+                }
+                std::cerr << "RPC call failed: " << errorMsg << std::endl;
+                return { "", 0 };
+            }
+        } catch (const std::exception& e) {
+            std::cerr << "Failed to execute RPC call: " << e.what() << std::endl;
+            return { "", 0 };
+        }
+    }
 
 private:
     static size_t WriteCallback(void* contents, size_t size, size_t nmemb, std::string* userp) {

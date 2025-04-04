@@ -45,6 +45,9 @@ find_package(gRPC CONFIG REQUIRED)
 find_package(CURL CONFIG REQUIRED)
 find_package(nlohmann_json CONFIG REQUIRED)
 
+# Find Qt (needed for UI)
+find_package(Qt5 COMPONENTS Widgets Core REQUIRED)
+
 # Generate protobuf and gRPC files
 find_program(PROTOC protoc REQUIRED)
 find_program(GRPC_CPP_PLUGIN grpc_cpp_plugin REQUIRED)
@@ -102,16 +105,15 @@ include_directories(${CURL_INCLUDE_DIRS})
 # Set source file properties
 set_source_files_properties(src/miner.cu PROPERTIES LANGUAGE CUDA)
 
-# Add executable
-add_executable(miner
-    src/main.cpp
+# Create a library for miner functionality
+add_library(miner_lib
     src/miner.cu
     src/miner_service.cpp
     src/hash_writer.cpp
 )
 
-target_link_libraries(miner
-    PRIVATE
+target_link_libraries(miner_lib
+    PUBLIC
     gRPC::gpr
     gRPC::grpc
     gRPC::grpc++
@@ -127,17 +129,36 @@ target_link_libraries(miner
     proto_lib
 )
 
-# Set CUDA specific properties
-set_target_properties(miner PROPERTIES
+target_include_directories(miner_lib
+    PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+)
+
+# Set CUDA specific properties for miner_lib
+set_target_properties(miner_lib PROPERTIES
     CUDA_SEPARABLE_COMPILATION ON
     CUDA_ARCHITECTURES native
+)
+
+# Add executable for CLI miner
+add_executable(miner
+    src/main.cpp
+)
+
+target_link_libraries(miner
+    PRIVATE
+    miner_lib
 )
 
 # Set compiler options for MSVC
 if(MSVC)
     set(MSVC_COMPILE_OPTIONS "/W4")
-    target_compile_options(miner PRIVATE
+    target_compile_options(miner_lib PRIVATE
         "$<$<COMPILE_LANGUAGE:CXX>:${MSVC_COMPILE_OPTIONS}>"
         "$<$<COMPILE_LANGUAGE:CUDA>:-Xcompiler=${MSVC_COMPILE_OPTIONS}>"
     )
+    target_compile_options(miner PRIVATE "${MSVC_COMPILE_OPTIONS}")
 endif()
+
+# Add the UI subdirectory
+add_subdirectory(src/ui)

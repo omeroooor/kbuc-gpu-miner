@@ -21,6 +21,12 @@
         },
         {
             "name": "nlohmann-json"
+        },
+        {
+            "name": "qt5-base"
+        },
+        {
+            "name": "qt5-tools"
         }
     ]
 }

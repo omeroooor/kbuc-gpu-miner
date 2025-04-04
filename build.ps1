@@ -6,8 +6,7 @@ $tempFile = New-TemporaryFile
 $batchContent = @"
 call "$vcvarsall" x64
 set PATH=%PATH%;%CD%\ninja-build
-rmdir /s /q build
-mkdir build
+mkdir build 2>nul
 cd build
 "C:\Program Files\CMake\bin\cmake.exe" -G "Ninja" ^
     -DCMAKE_MAKE_PROGRAM="%CD%\..\ninja-build\ninja.exe" ^
@@ -15,7 +14,7 @@ cd build
     -DCMAKE_CXX_COMPILER="cl.exe" ^
     -DCMAKE_CUDA_COMPILER="C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.3/bin/nvcc.exe" ^
     ..
-"%CD%\..\ninja-build\ninja.exe"
+"%CD%\..\ninja-build\ninja.exe" miner_ui
 "@
 $batchContent | Out-File -FilePath "$tempFile.bat" -Encoding ASCII
 
